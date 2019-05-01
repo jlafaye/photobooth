@@ -89,7 +89,6 @@ class GuiProcess(mp.Process):
         logging.debug('Exit GuiProcess')
         return retval
 
-
 class WorkerProcess(mp.Process):
 
     def __init__(self, argv, config, comm):

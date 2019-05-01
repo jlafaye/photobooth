@@ -51,6 +51,10 @@ class GuiSkeleton:
 
         raise NotImplementedError()
 
+    def showShotsetup(self, state):
+
+        raise NotImplementedError()
+
     def showCountdown(self, state):
 
         raise NotImplementedError()
@@ -89,6 +93,8 @@ class GuiSkeleton:
             self.showIdle(state)
         elif isinstance(state, StateMachine.GreeterState):
             self.showGreeter(state)
+        elif isinstance(state, StateMachine.ShotsetupState):
+            self.showShotsetup(state)
         elif isinstance(state, StateMachine.CountdownState):
             self.showCountdown(state)
         elif isinstance(state, StateMachine.CaptureState):
@@ -101,3 +107,5 @@ class GuiSkeleton:
             self.showPostprocess(state)
         elif isinstance(state, StateMachine.TeardownState):
             self.teardown(state)
+        else:
+            assert False

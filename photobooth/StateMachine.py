@@ -20,6 +20,7 @@
 import logging
 
 from . import util
+from .Threading import Workers
 
 
 class Context:
@@ -368,8 +369,25 @@ class GreeterState(State):
         super().__init__()
 
     def handleEvent(self, event, context):
-
         if ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'shotsetup'):
+            context.state = ShotsetupState()
+        else:
+            raise TypeError('Unknown Event type "{}"'.format(event))
+
+
+class ShotsetupState(State):
+
+    def __init__(self, color=None):
+        super().__init__()
+
+        self._color = color
+
+    def handleEvent(self, event, context):
+
+        if isinstance(event, GuiEvent) and event.name == 'shotsetup':
+            pass
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
            event.name == 'countdown'):
             context.state = CountdownState(1)
         else:
@@ -392,6 +410,8 @@ class CountdownState(State):
     def handleEvent(self, event, context):
 
         if isinstance(event, GuiEvent) and event.name == 'countdown':
+            pass
+        elif isinstance(event, GuiEvent) and event.name == 'shotsetup':
             pass
         elif isinstance(event, GuiEvent) and event.name == 'capture':
             context.state = CaptureState(self.num_picture)

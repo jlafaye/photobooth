@@ -202,6 +202,7 @@ setup(
         'pyqt': ['PyQt5'],
         'picamera': ['picamera'],
         'gphoto2-cffi': ['gphoto2-cffi'],
+        'yeelight': ['yeelight'],
         'dev': ['setuptools', 'wheel', 'twine', 'Babel',],
     },
 
