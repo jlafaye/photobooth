@@ -29,22 +29,25 @@ class YeeLight:
         self._light_ip = light_ip
         self._bulb = None
         self.initialize()
+        self.do(self._bulb.turn_on)
 
     def do(self, op, *args):
+        logging.info("Calling op: {}".format(op))
         try:
-            self.initialize()
             op(*args)
         except:
             logging.warn(("Unable to perform light operation: {} "
                 " with arguments: {}\n{}").format(op, args, traceback.format_exc()))
             self._bulb = None
+            self.initialize()
 
     def initialize(self):
+        logging.info('initializing {}'.format(self._light_ip))
         if self._bulb is None:
             self._bulb = yeelight.Bulb(self._light_ip)
-            self.do(self._bulb.turn_on)
 
     def setColor(self, rgb):
+        logging.info('setColor rgb={}'.format(rgb))
         self.do(self._bulb.set_rgb, rgb[0], rgb[1], rgb[2])
 
 
