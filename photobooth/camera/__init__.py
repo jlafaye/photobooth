@@ -34,6 +34,8 @@ modules = (
      'CameraGphoto2CommandLine'),
     ('opencv', 'CameraOpenCV', 'CameraOpenCV'),
     ('picamera', 'CameraPicamera', 'CameraPicamera'),
+    ('overlaypicamera', 'CameraOverlayPicamera',
+     'CameraOverlayPicamera'),
     ('dummy', 'CameraDummy', 'CameraDummy'))
 
 
