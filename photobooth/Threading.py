@@ -70,3 +70,4 @@ class Workers(IntEnum):
     CAMERA = 2
     GPIO = 3
     WORKER = 4
+    LIGHT = 5

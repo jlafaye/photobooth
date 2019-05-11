@@ -1,6 +1,9 @@
 import logging
 import traceback
 
+from .. import StateMachine
+from ..Threading import Workers
+
 has_yeelight = False
 
 try:
@@ -23,13 +26,75 @@ colorsXX = {
         'gold': (255, 215, 0)
 }
 
+class Light:
+
+    def __init__(self, config, comm):
+        super().__init__()
+
+        self._comm = comm
+        self._colors = []
+        self._light = None
+
+        self._is_enabled = config.getBool('PoseSetup', 'enable')
+
+        self.initLight(config)
+
+    def initLight(self, config):
+        
+        if self._is_enabled:
+
+            # colors
+            for n in range(10):
+                color_name = config.get('PoseSetup', 'color_name_{}'.format(n))
+                color_rgb = config.get('PoseSetup', 'color_rgb_{}'.format(n))
+                if not color_name or not color_rgb:
+                    continue
+                self._colors.append((color_name,
+                                    list(map(int, color_rgb.split(',')))))
+
+            module = config.get('PoseSetup', 'module')
+            light_ip = config.get('PoseSetup', 'light_ip')
+
+            if module == 'yeelight' and has_yeelight:
+                self._light = YeeLight(light_ip)
+            else:
+                logging.warn("Unable to create light, module:{} light_ip:{}".format(light_ip, module))
+
+
+
+    def startup(self):
+        self._light.initialize()
+        self._light.turnOn()
+
+    def teardown(self):
+        self._light.turnOff()
+
+    def run(self):
+
+        for state in self._comm.iter(Workers.LIGHT):
+            self.handleState(state)
+
+        return True
+
+    def handleState(self, state):
+        if isinstance(state, StateMachine.StartupState):
+            self.startup()
+        elif isinstance(state, StateMachine.GreeterState):
+            color_pos = state._light_color % len(self._colors)
+            color_name, color_rgb = self._colors[color_pos]
+            self._light.turnOn()
+            self._light.setColor(color_rgb)
+        elif isinstance(state, StateMachine.IdleState):
+            self._light.turnOff()
+        elif isinstance(state, StateMachine.TeardownState):
+            self.teardown()
+        # TODO: implement retro feedback to GUI once the color has changed
+
 class YeeLight:
 
     def __init__(self, light_ip):
         self._light_ip = light_ip
         self._bulb = None
-        self.initialize()
-        self.do(self._bulb.turn_on)
 
     def do(self, op, *args):
         logging.info("Calling op: {}".format(op))
@@ -45,6 +110,12 @@ class YeeLight:
         logging.info('initializing {}'.format(self._light_ip))
         if self._bulb is None:
             self._bulb = yeelight.Bulb(self._light_ip)
+
+    def turnOn(self):
+        self.do(self._bulb.turn_on)
+
+    def turnOff(self):
+        self.do(self._bulb.turn_off)
 
     def setColor(self, rgb):
         logging.info('setColor rgb={}'.format(rgb))

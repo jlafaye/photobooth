@@ -105,7 +105,8 @@ class IdleMessage(QtWidgets.QFrame):
 
 class GreeterMessage(QtWidgets.QFrame):
 
-    def __init__(self, num_x, num_y, skip_last, shotsetup_action):
+    def __init__(self, num_x, num_y, skip_last,
+                 light_color, next_color_action, shotsetup_action):
 
         super().__init__()
         self.setObjectName('GreeterMessage')
@@ -113,18 +114,23 @@ class GreeterMessage(QtWidgets.QFrame):
         self._text_title = _('Get ready!')
         self._text_button = _('Start countdown')
 
+        self._text_color_button = _('Change light color')
+
         num_pictures = max(num_x * num_y - int(skip_last), 1)
         if num_pictures > 1:
             self._text_label = _('for {} pictures...').format(num_pictures)
         else:
             self._text_label = ''
 
-        self.initFrame(shotsetup_action)
+        self.initFrame(next_color_action, shotsetup_action)
 
-    def initFrame(self, shotsetup_action):
+    def initFrame(self, next_color_action, shotsetup_action):
 
         ttl = QtWidgets.QLabel(self._text_title)
         ttl.setObjectName('title')
+        color_btn = QtWidgets.QPushButton(self._text_color_button)
+        color_btn.setObjectName('color_button')
+        color_btn.clicked.connect(next_color_action)
         btn = QtWidgets.QPushButton(self._text_button)
         btn.setObjectName('button')
         btn.clicked.connect(shotsetup_action)
@@ -133,95 +139,6 @@ class GreeterMessage(QtWidgets.QFrame):
 
         lay = QtWidgets.QVBoxLayout()
         lay.addWidget(ttl)
-        lay.addWidget(btn)
-        lay.addWidget(lbl)
-        self.setLayout(lay)
-
-class ShotsetupMessage(QtWidgets.QFrame):
-
-    def __init__(self, light_ip, colors, worker, countdown_action):
-
-        super().__init__()
-        self.setObjectName('ShotsetupMessage')
-
-        self._text_title = _('Shot setup text title')
-        self._text_button = _('Shot setup text button')
-        self._text_label = _('Shot setup text label')
-
-        self._text_color_button = _('Next color')
-
-        self._worker = worker
-        self._light_ip = light_ip
-        self._curr_color_pos = 0
-        self._colors = [color_name for (color_name, color_rgb) in colors]
-        self._color_map = {color_name: color_rgb for (color_name, color_rgb) in colors}
-
-        self.initFrame(countdown_action)
-
-    def initFrame(self, countdown_action):
-
-        groupBox = QtWidgets.QGroupBox('Lightning')
-        groupBoxVBox = QtWidgets.QVBoxLayout()
-
-        def update_color(color_number):
-            self._curr_color_pos = color_number
-            color = self._colors[self._curr_color_pos]
-            rgb = self._color_map[color]
-            # TODO: push color change to the worker
-            logging.info('Changing to color {}/{} for ip {}'.format(color, rgb, self._light_ip))
-            bulb = light.getOrCreateLight(self._light_ip)
-            if bulb is not None:
-                bulb.setColor(rgb)
-
-        def action_next_color():
-            next_color_pos = self._curr_color_pos + 1
-            if next_color_pos >= len(self._colors):
-                next_color_pos = 0
-            next_color_name = self._colors[next_color_pos]
-            for button in groupBox.children():
-                if button.objectName() == next_color_name:
-                    button.setChecked(True)
-                    break
-            update_color(next_color_pos)
-
-        def action_select_color(button):
-            buttons = groupBoxVBox.children()
-            color_name = button.objectName()
-            color_pos = self._colors.index(color_name)
-            update_color(color_pos)
-
-        def make_radio_button(color_name):
-            button = QtWidgets.QRadioButton(color_name.capitalize())
-            button.setObjectName(color_name)
-            button.clicked.connect(functools.partial(action_select_color, button))
-            return button
-    
-        update_color(0)
-
-        for pos, color_name in enumerate(self._colors):
-            button = make_radio_button(color_name)
-            if pos == 0:
-                button.setChecked(True)
-            groupBoxVBox.addWidget(button)
-        groupBox.setLayout(groupBoxVBox)
-
-        ttl = QtWidgets.QLabel(self._text_title)
-        ttl.setObjectName('title')
-
-        color_btn = QtWidgets.QPushButton(self._text_color_button)
-        color_btn.setObjectName('color_button')
-        color_btn.clicked.connect(action_next_color)
-
-        btn = QtWidgets.QPushButton(self._text_button)
-        btn.setObjectName('button')
-        btn.clicked.connect(countdown_action)
-
-        lbl = QtWidgets.QLabel(self._text_label)
-        lbl.setObjectName('message')
-
-        lay = QtWidgets.QVBoxLayout()
-        lay.addWidget(ttl)
-        lay.addWidget(groupBox)
         lay.addWidget(color_btn)
         lay.addWidget(btn)
         lay.addWidget(lbl)

@@ -175,7 +175,7 @@ class PyQt5Gui(GuiSkeleton):
     def showGreeter(self, state):
 
         self._enableEscape()
-        self._disableTrigger()
+        self._enableTrigger()
 
         num_pic = (self._cfg.getInt('Picture', 'num_x'),
                    self._cfg.getInt('Picture', 'num_y'))
@@ -184,34 +184,13 @@ class PyQt5Gui(GuiSkeleton):
 
         self._setWidget(Frames.GreeterMessage(
             *num_pic, skip_last,
-            lambda: self._comm.send(Workers.MASTER, GuiEvent('shotsetup'))))
-
-        QtCore.QTimer.singleShot(
-            greeter_time,
-            lambda: self._comm.send(Workers.MASTER, GuiEvent('shotsetup')))
-
-    def showShotsetup(self, state):
-
-        self._enableEscape()
-        self._disableTrigger()
-
-        greeter_time = self._cfg.getInt('Photobooth', 'greeter_time') * 1000
-        light_ip = self._cfg.get('PoseSetup', 'light_ip')
-        colors = []
-
-        for n in range(10):
-            color_name = self._cfg.get('PoseSetup', 'color_name_{}'.format(n))
-            color_rgb = self._cfg.get('PoseSetup', 'color_rgb_{}'.format(n))
-            if not color_name or not color_rgb:
-                continue
-            colors.append((color_name,
-                           list(map(int, color_rgb.split(',')))))
-
-        self._setWidget(Frames.ShotsetupMessage(
-            light_ip,
-            colors,
-            self._worker,
+            state._light_color,
+            lambda: self._comm.send(Workers.MASTER, GuiEvent('action')),
             lambda: self._comm.send(Workers.MASTER, GuiEvent('countdown'))))
+
+        #QtCore.QTimer.singleShot(
+        #    greeter_time,
+        #    lambda: self._comm.send(Workers.MASTER, GuiEvent('countdown')))
 
 
     def showCountdown(self, state):

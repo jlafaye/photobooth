@@ -47,6 +47,7 @@ class Gpio:
 
             lamp_pin = config.getInt('Gpio', 'lamp_pin')
             trigger_pin = config.getInt('Gpio', 'trigger_pin')
+            action_pin = config.getInt('Gpio', 'action_pin')
             exit_pin = config.getInt('Gpio', 'exit_pin')
 
             rgb_pin = (config.getInt('Gpio', 'chan_r_pin'),
@@ -54,9 +55,10 @@ class Gpio:
                        config.getInt('Gpio', 'chan_b_pin'))
 
             logging.info(('GPIO enabled (lamp_pin=%d, trigger_pin=%d, '
-                         'exit_pin=%d, rgb_pins=(%d, %d, %d))'),
-                         lamp_pin, trigger_pin, exit_pin, *rgb_pin)
+                         'action_pin=%d, exit_pin=%d, rgb_pins=(%d, %d, %d))'),
+                         lamp_pin, trigger_pin, action_pin, exit_pin, *rgb_pin)
 
+            self._gpio.setButton(action_pin, self.action)
             self._gpio.setButton(trigger_pin, self.trigger)
             self._gpio.setButton(exit_pin, self.exit)
             self._lamp = self._gpio.setLamp(lamp_pin)
@@ -99,13 +101,12 @@ class Gpio:
 
         if self._is_enabled:
             self._is_trigger = True
-            self._gpio.lampOn(self._lamp)
+            # self._gpio.lampOn(self._lamp)
 
     def disableTrigger(self):
-
         if self._is_enabled:
             self._is_trigger = False
-            self._gpio.lampOff(self._lamp)
+            # self._gpio.lampOff(self._lamp)
 
     def setRgbColor(self, r, g, b):
 
@@ -128,8 +129,10 @@ class Gpio:
             self._gpio.rgbBlink(self._rgb, 0.5, 0.5, 0.1, 0.1, (1, 0, 0),
                                 (0, 0, 0), self._countdown_time)
 
-    def trigger(self):
+    def action(self):
+        self._comm.send(Workers.MASTER, StateMachine.GpioEvent('action'))
 
+    def trigger(self):
         if self._is_trigger:
             self.disableTrigger()
             self._comm.send(Workers.MASTER, StateMachine.GpioEvent('trigger'))
@@ -144,6 +147,8 @@ class Gpio:
 
         self.enableTrigger()
 
+        self._gpio.lampOff(self._lamp)
+
         if self._is_enabled:
             h, s, v = 0, 1, 1
             while self._comm.empty(Workers.GPIO):
@@ -153,31 +158,38 @@ class Gpio:
                 sleep(0.1)
 
     def showGreeter(self):
+        self._gpio.lampOff(self._lamp)
 
-        self.disableTrigger()
+        self.enableTrigger()
         self.rgbOff()
 
     def showCountdown(self):
+
+        self._gpio.lampOn(self._lamp)
 
         sleep(0.2)
         self.rgbBlink()
 
     def showCapture(self):
+        self._gpio.lampOff(self._lamp)
 
         self.rgbOn()
         self.setRgbColor(1, 1, .9)
 
     def showAssemble(self):
+        self._gpio.lampOff(self._lamp)
 
         self.rgbOff()
 
     def showReview(self):
+        self._gpio.lampOff(self._lamp)
 
         self.setRgbColor(0, .15, 0)
 
     def showPostprocess(self):
+        self._gpio.lampOff(self._lamp)
 
-        pass
+        self.enableTrigger()
 
 
 class Entities:

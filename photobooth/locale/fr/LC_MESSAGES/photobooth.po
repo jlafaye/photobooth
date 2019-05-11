@@ -33,7 +33,7 @@ msgstr "Appuyez sur le"
 
 #: photobooth/gui/Qt5Gui/Frames.py:88
 msgid "Button!"
-msgstr "Bouton !"
+msgstr "Bouton rouge !"
 
 #: photobooth/gui/Qt5Gui/Frames.py:111
 msgid "Get ready!"

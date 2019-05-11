@@ -358,37 +358,30 @@ class IdleState(State):
         if ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
            event.name == 'trigger'):
             context.state = GreeterState()
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'action'):
+            context.state = GreeterState()
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
 
 
 class GreeterState(State):
 
-    def __init__(self):
+    def __init__(self, light_color=0):
 
         super().__init__()
+
+        self._light_color = light_color
 
     def handleEvent(self, event, context):
         if ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
-           event.name == 'shotsetup'):
-            context.state = ShotsetupState()
-        else:
-            raise TypeError('Unknown Event type "{}"'.format(event))
-
-
-class ShotsetupState(State):
-
-    def __init__(self, color=None):
-        super().__init__()
-
-        self._color = color
-
-    def handleEvent(self, event, context):
-
-        if isinstance(event, GuiEvent) and event.name == 'shotsetup':
-            pass
+           event.name == 'action'):
+            context.state = GreeterState(self._light_color + 1)
         elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
            event.name == 'countdown'):
+            context.state = CountdownState(1)
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'trigger'):
             context.state = CountdownState(1)
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
@@ -411,7 +404,7 @@ class CountdownState(State):
 
         if isinstance(event, GuiEvent) and event.name == 'countdown':
             pass
-        elif isinstance(event, GuiEvent) and event.name == 'shotsetup':
+        elif isinstance(event, GuiEvent) and event.name == 'action':
             pass
         elif isinstance(event, GuiEvent) and event.name == 'capture':
             context.state = CaptureState(self.num_picture)
@@ -472,6 +465,12 @@ class ReviewState(State):
 
         if isinstance(event, GuiEvent) and event.name == 'postprocess':
             context.state = PostprocessState()
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'trigger'):
+            pass
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'action'):
+            pass
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
 
@@ -486,6 +485,12 @@ class PostprocessState(State):
 
         if ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
            event.name == 'idle'):
+            context.state = IdleState()
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'trigger'):
+            context.state = IdleState()
+        elif ((isinstance(event, GuiEvent) or isinstance(event, GpioEvent)) and
+           event.name == 'action'):
             context.state = IdleState()
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))

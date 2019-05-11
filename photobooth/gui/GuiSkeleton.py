@@ -93,8 +93,6 @@ class GuiSkeleton:
             self.showIdle(state)
         elif isinstance(state, StateMachine.GreeterState):
             self.showGreeter(state)
-        elif isinstance(state, StateMachine.ShotsetupState):
-            self.showShotsetup(state)
         elif isinstance(state, StateMachine.CountdownState):
             self.showCountdown(state)
         elif isinstance(state, StateMachine.CaptureState):

@@ -41,7 +41,7 @@ msgstr "Get ready!"
 
 #: photobooth/gui/Qt5Gui/Frames.py:112
 msgid "Start countdown"
-msgstr "Start countdown"
+msgstr "Start countdownX"
 
 #: photobooth/gui/Qt5Gui/Frames.py:116
 msgid "for {} pictures..."

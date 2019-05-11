@@ -33,6 +33,7 @@ import multiprocessing as mp
 from . import camera, gui
 from .Config import Config
 from .gpio import Gpio
+from .light import Light
 from .util import lookup_and_import
 from .StateMachine import Context, ErrorEvent
 from .Threading import Communicator, Workers
@@ -41,6 +42,27 @@ from .worker import Worker
 # Globally install gettext for I18N
 gettext.install('photobooth', 'photobooth/locale')
 
+class LightProcess(mp.Process):
+
+    def __init__(self, argv, config, comm):
+
+        super().__init__()
+        self.daemon = True
+
+        self._cfg = config
+        self._comm = comm
+
+    def run(self):
+
+        logging.debug('Start LightProcess')
+
+        while True:
+            try:
+                if Light(self._cfg, self._comm).run():
+                    break
+            except Exception as e:
+                self._comm.send(Workers.MASTER, ErrorEvent('Light', str(e)))
+        logging.debug('Exit LightProcess')
 
 class CameraProcess(mp.Process):
 
@@ -164,7 +186,9 @@ def run(argv, is_run):
     # 3. GUI
     # 4. Postprocessing worker
     # 5. GPIO handler
-    proc_classes = (CameraProcess, WorkerProcess, GuiProcess, GpioProcess)
+    # 6. Light handling
+    proc_classes = (CameraProcess, WorkerProcess, GuiProcess,
+                    GpioProcess, LightProcess)
     procs = [P(argv, config, comm) for P in proc_classes]
 
     for proc in procs:
