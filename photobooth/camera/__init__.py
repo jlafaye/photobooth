@@ -131,6 +131,8 @@ class Camera:
         if self._is_preview:
             while self._comm.empty(Workers.CAMERA):
                 picture = self._cap.getPreview()
+                if picture is None:
+                    continue
                 if self._rotation is not None:
                     picture = picture.transpose(self._rotation)
                 picture = picture.resize(self._pic_dims.previewSize)

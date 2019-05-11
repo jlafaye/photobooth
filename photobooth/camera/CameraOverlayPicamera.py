@@ -33,15 +33,13 @@ class CameraOverlayPicamera(CameraInterface):
 
         super().__init__()
 
-        # hasPreview should be set to false because
-        # picamera overlay mechanism bypasses QT
-        # rendering
-        self.hasPreview = False
+        self.hasPreview = True
         self.hasIdle = True
 
         logging.info('Using OverlayPiCamera')
 
         self._cap = None
+        self._previewActive = False
 
         self.setActive()
         self._preview_resolution = (self._cap.resolution[0] // 2,
@@ -50,9 +48,11 @@ class CameraOverlayPicamera(CameraInterface):
 
     def setActive(self):
 
+        # setActive is turned on in greeter state
+        # but it is too soon to activate the overlay
+        # we wait for the call to getPreview to do it
         if self._cap is None or self._cap.closed:
             self._cap = PiCamera()
-            self._cap.start_preview(alpha=200)
 
     def setIdle(self):
 
@@ -62,13 +62,12 @@ class CameraOverlayPicamera(CameraInterface):
             self._cap = None
 
     def getPreview(self):
+        if not self._previewActive:
+            self._cap.start_preview(alpha=200)
+            self._previewActive = True
 
-        self.setActive()
-        stream = io.BytesIO()
-        self._cap.capture(stream, format='jpeg', use_video_port=True,
-                          resize=self._preview_resolution)
-        stream.seek(0)
-        return Image.open(stream)
+        return None
+
 
     def getPicture(self):
 
