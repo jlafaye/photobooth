@@ -408,6 +408,8 @@ class CountdownState(State):
             pass
         elif isinstance(event, GuiEvent) and event.name == 'capture':
             context.state = CaptureState(self.num_picture)
+        elif isinstance(event, GpioEvent):
+            pass
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
 
@@ -431,6 +433,8 @@ class CaptureState(State):
             context.state = CountdownState(self.num_picture + 1)
         elif isinstance(event, CameraEvent) and event.name == 'assemble':
             context.state = AssembleState()
+        elif isinstance(event, GpioEvent):
+            pass
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
 
@@ -445,6 +449,8 @@ class AssembleState(State):
 
         if isinstance(event, CameraEvent) and event.name == 'review':
             context.state = ReviewState(event.picture)
+        elif isinstance(event, GpioEvent):
+            pass
         else:
             raise TypeError('Unknown Event type "{}"'.format(event))
 
