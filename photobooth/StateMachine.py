@@ -406,6 +406,8 @@ class CountdownState(State):
             pass
         elif isinstance(event, GuiEvent) and event.name == 'action':
             pass
+        elif isinstance(event, GuiEvent) and event.name == 'trigger':
+            pass
         elif isinstance(event, GuiEvent) and event.name == 'capture':
             context.state = CaptureState(self.num_picture)
         elif isinstance(event, GpioEvent):
