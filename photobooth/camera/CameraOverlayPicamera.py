@@ -23,6 +23,7 @@ import logging
 from PIL import Image
 
 from picamera import PiCamera
+from time import sleep
 
 from .CameraInterface import CameraInterface
 
@@ -72,7 +73,7 @@ class CameraOverlayPicamera(CameraInterface):
 
         # a little tempo to ensure light/white balance
         # automatic settings are performed
-        time.sleep(1)
+        sleep(1)
         stream = io.BytesIO()
         self._cap.capture(stream, format='jpeg', resize=None)
         stream.seek(0)
