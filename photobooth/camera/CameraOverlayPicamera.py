@@ -47,7 +47,6 @@ class CameraOverlayPicamera(CameraInterface):
         self.setIdle()
 
     def setActive(self):
-
         # setActive is turned on in greeter state
         # but it is too soon to activate the overlay
         # we wait for the call to getPreview to do it
@@ -55,7 +54,6 @@ class CameraOverlayPicamera(CameraInterface):
             self._cap = PiCamera()
 
     def setIdle(self):
-
         if self._cap is not None and not self._cap.closed:
             self._cap.stop_preview()
             self._cap.close()
@@ -70,8 +68,11 @@ class CameraOverlayPicamera(CameraInterface):
 
 
     def getPicture(self):
-
         self.setActive()
+
+        # a little tempo to ensure light/white balance
+        # automatic settings are performed
+        time.sleep(1)
         stream = io.BytesIO()
         self._cap.capture(stream, format='jpeg', resize=None)
         stream.seek(0)
