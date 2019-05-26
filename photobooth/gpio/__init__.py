@@ -171,7 +171,7 @@ class Gpio:
         self.rgbBlink()
 
     def showCapture(self):
-        self._gpio.lampOff(self._lamp)
+        self._gpio.lampOn(self._lamp)
 
         self.rgbOn()
         self.setRgbColor(1, 1, .9)
