@@ -180,17 +180,18 @@ class PyQt5Gui(GuiSkeleton):
         num_pic = (self._cfg.getInt('Picture', 'num_x'),
                    self._cfg.getInt('Picture', 'num_y'))
         skip_last = self._cfg.getBool('Picture', 'skip_last')
-        greeter_time = self._cfg.getInt('Photobooth', 'greeter_time') * 1000
+        has_pose_light = self._cfg.getBool('PoseSetup', 'enable') 
+
+        next_color_action = None
+        if has_pose_light:
+            next_color_action = lambda: self._comm.send(Workers.MASTER, GuiEvent('action'))
 
         self._setWidget(Frames.GreeterMessage(
             *num_pic, skip_last,
             state._light_color,
-            lambda: self._comm.send(Workers.MASTER, GuiEvent('action')),
+            next_color_action,
             lambda: self._comm.send(Workers.MASTER, GuiEvent('countdown'))))
 
-        #QtCore.QTimer.singleShot(
-        #    greeter_time,
-        #    lambda: self._comm.send(Workers.MASTER, GuiEvent('countdown')))
 
 
     def showCountdown(self, state):

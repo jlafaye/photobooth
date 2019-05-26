@@ -77,6 +77,9 @@ class Light:
         return True
 
     def handleState(self, state):
+        if not self._is_enabled:
+            return
+
         if isinstance(state, StateMachine.StartupState):
             self.startup()
         elif isinstance(state, StateMachine.GreeterState):

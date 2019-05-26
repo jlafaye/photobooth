@@ -125,12 +125,12 @@ class GreeterMessage(QtWidgets.QFrame):
         self.initFrame(next_color_action, shotsetup_action)
 
     def initFrame(self, next_color_action, shotsetup_action):
-
         ttl = QtWidgets.QLabel(self._text_title)
         ttl.setObjectName('title')
-        color_btn = QtWidgets.QPushButton(self._text_color_button)
-        color_btn.setObjectName('color_button')
-        color_btn.clicked.connect(next_color_action)
+        if next_color_action is not None:
+            color_btn = QtWidgets.QPushButton(self._text_color_button)
+            color_btn.setObjectName('color_button')
+            color_btn.clicked.connect(next_color_action)
         btn = QtWidgets.QPushButton(self._text_button)
         btn.setObjectName('button')
         btn.clicked.connect(shotsetup_action)
@@ -139,7 +139,8 @@ class GreeterMessage(QtWidgets.QFrame):
 
         lay = QtWidgets.QVBoxLayout()
         lay.addWidget(ttl)
-        lay.addWidget(color_btn)
+        if next_color_action is not None:
+            lay.addWidget(color_btn)
         lay.addWidget(btn)
         lay.addWidget(lbl)
         self.setLayout(lay)
