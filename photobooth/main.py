@@ -29,6 +29,7 @@ import gettext
 import logging
 import logging.handlers
 import multiprocessing as mp
+import os
 
 from . import camera, gui
 from .Config import Config
@@ -40,7 +41,11 @@ from .Threading import Communicator, Workers
 from .worker import Worker
 
 # Globally install gettext for I18N
-gettext.install('photobooth', 'photobooth/locale')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+localedir = os.path.join(dir_path, 'locale')
+
+gettext.install('photobooth', localedir=localedir)
+
 
 class LightProcess(mp.Process):
 

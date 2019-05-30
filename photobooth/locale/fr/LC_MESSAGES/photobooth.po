@@ -9,11 +9,11 @@ msgstr ""
 
 #: photobooth/gui/Qt5Gui/Frames.py:50
 msgid "Start photobooth"
-msgstr "Démarrer photobooth"
+msgstr "Démarrer"
 
 #: photobooth/gui/Qt5Gui/Frames.py:53
 msgid "Set date/time"
-msgstr "Définir date/heure"
+msgstr "Date/heure"
 
 #: photobooth/gui/Qt5Gui/Frames.py:56
 msgid "Settings"
@@ -33,15 +33,18 @@ msgstr "Appuyez sur le"
 
 #: photobooth/gui/Qt5Gui/Frames.py:88
 msgid "Button!"
-msgstr "Bouton rouge !"
+msgstr "Bouton!"
 
 #: photobooth/gui/Qt5Gui/Frames.py:111
 msgid "Get ready!"
-msgstr "Préparez-vous !"
+msgstr "Préparez-vous!"
+
+msgid "Change light color"
+msgstr "Eclairage"
 
 #: photobooth/gui/Qt5Gui/Frames.py:112
 msgid "Start countdown"
-msgstr "Démarrage du décompte"
+msgstr "Décompte"
 
 #: photobooth/gui/Qt5Gui/Frames.py:116
 msgid "for {} pictures..."
@@ -51,13 +54,16 @@ msgstr "Pour {} photos ..."
 msgid "Picture {} of {}..."
 msgstr "Photo {} sur {} ..."
 
+msgid "Taking a photo..."
+msgstr "Capture en cours"
+
 #: photobooth/gui/Qt5Gui/Frames.py:342
 msgid "Start over"
 msgstr "Recommencer"
 
 #: photobooth/gui/Qt5Gui/Frames.py:351
 msgid "Happy?"
-msgstr "Satisfait ?"
+msgstr "Satisfait?"
 
 #: photobooth/gui/Qt5Gui/Frames.py:383
 msgid "Date:"
@@ -65,7 +71,7 @@ msgstr "Date :"
 
 #: photobooth/gui/Qt5Gui/Frames.py:384
 msgid "Time:"
-msgstr "Heure :"
+msgstr "Heure:"
 
 #: photobooth/gui/Qt5Gui/Frames.py:387
 msgid "Set system date and time:"
