@@ -43,8 +43,9 @@ class CameraOverlayPicamera(CameraInterface):
         self._previewActive = False
 
         self.setActive()
-        self._preview_resolution = (self._cap.resolution[0] // 2,
-                                    self._cap.resolution[1] // 2)
+
+        logging.info("Camera resolution is {}x{}'".format(self._cap.resolution[0],
+                                                          self._cap.resolution[1]))
         self.setIdle()
 
     def setActive(self):
@@ -53,6 +54,14 @@ class CameraOverlayPicamera(CameraInterface):
         # we wait for the call to getPreview to do it
         if self._cap is None or self._cap.closed:
             self._cap = PiCamera()
+
+            # According to https://picamera.readthedocs.io/en/release-1.10/api_camera.html
+            # "the resolution will default to the connected display's resolution"
+            display_resolution = self._cap.resolution
+
+            # but we like good pictures so we use
+            # the best resolution available
+            self._cap.resolution = PiCamera.MAX_RESOLUTION
 
     def setIdle(self):
         if self._cap is not None and not self._cap.closed:
