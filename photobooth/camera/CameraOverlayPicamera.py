@@ -68,6 +68,7 @@ class CameraOverlayPicamera(CameraInterface):
             self._cap.stop_preview()
             self._cap.close()
             self._cap = None
+            self._previewActive = False
 
     def getPreview(self):
         if not self._previewActive:
