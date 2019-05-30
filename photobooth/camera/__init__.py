@@ -54,6 +54,7 @@ class Camera:
 
         self._is_preview = self._cfg.getBool('Photobooth', 'show_preview')
         self._is_keep_pictures = self._cfg.getBool('Storage', 'keep_pictures')
+        self._no_assemble = self._cfg.getBool('Storage', 'no_assemble')
 
         rot_vals = {0: None, 90: Image.ROTATE_90, 180: Image.ROTATE_180,
                     270: Image.ROTATE_270}
@@ -168,14 +169,21 @@ class Camera:
 
         self.setIdle()
 
-        picture = self._template.copy()
-        for i in range(self._pic_dims.totalNumPictures):
-            shot = Image.open(self._pictures[i])
-            resized = shot.resize(self._pic_dims.thumbnailSize)
-            picture.paste(resized, self._pic_dims.thumbnailOffset[i])
+        if self._no_assemble:
+            for i in range(self._pic_dims.totalNumPictures):
+                self._comm.send(Workers.MASTER,
+                                StateMachine.CameraEvent('review', self._pictures[i]))
+        else:
+            picture = self._template.copy()
+            for i in range(self._pic_dims.totalNumPictures):
+                logging.info('Intermediate shot: {}'.format(self._pictures[i]))
+                logging.info('Resizing to: {}'.format(self._pic_dims.thumbnailSize))
+                shot = Image.open(self._pictures[i])
+                resized = shot.resize(self._pic_dims.thumbnailSize)
+                picture.paste(resized, self._pic_dims.thumbnailOffset[i])
 
-        byte_data = BytesIO()
-        picture.save(byte_data, format='jpeg')
-        self._comm.send(Workers.MASTER,
-                        StateMachine.CameraEvent('review', byte_data))
+            byte_data = BytesIO()
+            picture.save(byte_data, format='jpeg')
+            self._comm.send(Workers.MASTER,
+                            StateMachine.CameraEvent('review', byte_data))
         self._pictures = []
