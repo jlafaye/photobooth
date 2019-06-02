@@ -35,7 +35,7 @@ class CameraOverlayPicamera(CameraInterface):
         super().__init__()
 
         self.hasPreview = True
-        self.hasIdle = True
+        self.hasIdle = False
 
         logging.info('Using OverlayPiCamera')
 
@@ -63,17 +63,27 @@ class CameraOverlayPicamera(CameraInterface):
             # the best resolution available
             self._cap.resolution = PiCamera.MAX_RESOLUTION
 
+        self.stopPreview()
+
+    def startPreview(self):
+        if self._cap:
+            self._cap.start_preview(alpha=200)
+            self._previewActive = True
+
+    def stopPreview(self):
+        if self._cap:
+            self._cap.stop_preview()
+            self._previewActive = False
+
     def setIdle(self):
         if self._cap is not None and not self._cap.closed:
-            self._cap.stop_preview()
+            self.stopPreview()
             self._cap.close()
             self._cap = None
-            self._previewActive = False
 
     def getPreview(self):
         if not self._previewActive:
-            self._cap.start_preview(alpha=200)
-            self._previewActive = True
+            self.startPreview()
 
         return None
 
@@ -83,8 +93,8 @@ class CameraOverlayPicamera(CameraInterface):
 
         # a little tempo to ensure light/white balance
         # automatic settings are performed
-        sleep(1)
         stream = io.BytesIO()
         self._cap.capture(stream, format='jpeg', resize=None)
         stream.seek(0)
+
         return Image.open(stream)
